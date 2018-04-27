@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,15 +18,17 @@ import static org.smartinrub.authservice.SecurityConstants.*;
 @RestController
 public class JwtController {
 
-    private static final String USERNAME = "username";
+    private static final String PROFESSION = "profession";
 
     @PostMapping("/add")
-    public void addAuthentication(HttpServletResponse response, String email) {
+    public void addAuthentication(HttpServletResponse response, @RequestBody String body) {
+
+        String[] user = body.split("-");
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put(USERNAME, "World");
+        claims.put(PROFESSION, user[1]);
 
-        response.addHeader(HEADER_STRING, TOKEN_PREFIX + createToken(email, claims));
+        response.addHeader(HEADER_STRING, TOKEN_PREFIX + createToken(user[0], claims));
     }
 
     @PostMapping("/get")
@@ -38,7 +41,7 @@ public class JwtController {
                     .parseClaimsJws(token)
                     .getBody();
 
-            String username = claims.get(USERNAME).toString();
+            String username = claims.get(PROFESSION).toString();
             if (username != null) {
                 return username;
             }
